@@ -1,21 +1,19 @@
-# Exemplo de CRUD com PHP
+# CRUD de Usuários — PHP Estruturado
 
-Projeto voltado a fazer um crud fácil e simples. 
+CRUD simples em PHP estruturado, construído como projeto de portfólio.
 
-## Requisitos
+## 🛠 Tecnologias
+- PHP 8.2+
+- MySQL
+- PDO
 
-.PHP  
-.Pdo  
-.Mysql  
+## 🚀 Como rodar
+1. Clone o projeto
+2. Execute `Artefatos/PESSOA.sql`
+3. Acesse localhost
 
-## Instação
-
-.Execute o arquivo Artefatos/PESSOA.sql no Mysql
-
-## Confifiguração
-
-.Configure o banco de dados no inicio do arquivo index.php
-
-## Autor
-
-.Marcos Tolentino
+## 🔒 Segurança aplicada
+- Prepared statements (PDO)
+- Escape de saída (XSS)
+- Validação server-side
+- Padrão PRG

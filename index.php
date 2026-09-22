@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 //Configurações do banco de dados
-define('MYSQL_DBLIB', 'mysql');
-define('MYSQL_HOST', '127.0.0.1');
-define('MYSQL_DBNAME', 'CRUD');
-define('MYSQL_USERNAME', 'root');
-define('MYSQL_PASSWORD', '');
-define('MYSQL_CHARSET', 'utf8mb4');
+const BD_DBLIB = 'mysql';
+const BD_HOST = '127.0.0.1';
+const BD_DBNAME = 'CRUD';
+const BD_USERNAME = 'root';
+const BD_PASSWORD = '';
+const BD_CHARSET = 'utf8mb4';
 
 //PRINT_R PRE
 function pr($dado, $print_r = true)
@@ -29,8 +31,8 @@ $postAcao = null;
 
 try {
     //CONEXAO
-    $dsn = MYSQL_DBLIB . ':host=' . MYSQL_HOST . ';dbname=' . MYSQL_DBNAME . ';charset=' . MYSQL_CHARSET;
-    $PDO = new PDO($dsn, MYSQL_USERNAME, MYSQL_PASSWORD, [
+    $dsn = BD_DBLIB . ':host=' . BD_HOST . ';dbname=' . BD_DBNAME . ';charset=' . BD_CHARSET;
+    $PDO = new PDO($dsn, BD_USERNAME, BD_PASSWORD, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
@@ -151,13 +153,13 @@ if ($PDO) {
                             $pessoaArray[$pessoaFetch['ID_PESSOA']] = $pessoaFetch;
                             echo htmlspecialchars($pessoaFetch['NOME']);
                     ?>
-                        <!-- AÇÕES -->
-                        <form method="POST" style="display: inline; margin-left: 0.5rem;">
-                            <input type="hidden" name="ID_PESSOA" value="<?php echo (int)$pessoaFetch['ID_PESSOA'] ?>">
-                            <input name="ACAO" value="Editar" type="submit">
-                            <input name="ACAO" value="Excluir" type="submit">
-                        </form>
-                        <hr style="border: 0; border-top: 1px solid #ccc; margin: 0.5rem 0;">
+                            <!-- AÇÕES -->
+                            <form method="POST" style="display: inline; margin-left: 0.5rem;">
+                                <input type="hidden" name="ID_PESSOA" value="<?php echo (int)$pessoaFetch['ID_PESSOA'] ?>">
+                                <input name="ACAO" value="Editar" type="submit">
+                                <input name="ACAO" value="Excluir" type="submit">
+                            </form>
+                            <hr style="border: 0; border-top: 1px solid #ccc; margin: 0.5rem 0;">
                     <?php
                         }
                     }
