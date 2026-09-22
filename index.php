@@ -10,16 +10,7 @@ const BD_USERNAME = 'root';
 const BD_PASSWORD = '';
 const BD_CHARSET = 'utf8mb4';
 
-//PRINT_R PRE
-function pr($dado, $print_r = true)
-{
-    echo '<pre>';
-    if ($print_r) {
-        print_r($dado);
-    } else {
-        var_dump($dado);
-    }
-}
+const APP_DEBUG = true;  // false em produção
 
 $ok = false;
 $pessoaArray = [];
@@ -39,12 +30,12 @@ try {
     ]);
 
     $postAcao = filter_input(INPUT_POST, 'ACAO', FILTER_UNSAFE_RAW);
-    $postNome = filter_input(INPUT_POST, 'NOME', FILTER_SANITIZE_SPECIAL_CHARS);
+    $postNome = trim((string) filter_input(INPUT_POST, 'NOME', FILTER_UNSAFE_RAW));
     $postId   = filter_input(INPUT_POST, 'ID_PESSOA', FILTER_VALIDATE_INT);
 
     // INCLUIR
     if ($postAcao === 'Incluir') {
-        if ($postNome) {
+        if ($postNome !== '') {
             $acaoDescricaoOk = 'Incluído';
             $pesIncluir = $PDO->prepare('INSERT INTO PESSOA (NOME) VALUES (:NOME)');
             $ok = $pesIncluir->execute([':NOME' => $postNome]);
@@ -90,7 +81,9 @@ try {
     }
 } catch (Exception $ex) {
     error_log($ex->getMessage());
-    $mensagemErro = '<br><small>Ocorreu um erro interno no banco de dados.</small><br>';
+     $mensagemErro = APP_DEBUG
+        ? $ex->getMessage()
+        : 'Ocorreu um erro interno. Tente novamente em instantes.';
 }
 
 // SUSCESSO
@@ -129,8 +122,8 @@ if ($PDO) {
     <div style="width: 100%; max-width: 900px; margin: 0 auto; font-family: sans-serif; padding-top: 2rem;">
         <?php
         if ($postAcao && $ok) {
-            echo "<h3 style='color: green;'>$acaoDescricaoOk com sucesso! $mensagemErro</h3>";
-        } elseif (!$ok && $mensagemErro) {
+            echo "<h3 style='color: green;'>$acaoDescricaoOk com sucesso!</h3>";
+        } elseif ($mensagemErro) {
             echo "<h3 style='color: red;'>Não foi possível executar a ação! $mensagemErro</h3>";
         }
         ?>
