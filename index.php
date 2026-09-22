@@ -89,7 +89,11 @@ try {
 }
 
 // SUCESSO
-$getSucesso = filter_input(INPUT_GET, 'sucesso', FILTER_UNSAFE_RAW);
+$getEditarId = filter_input(INPUT_POST, 'ID_PESSOA', FILTER_VALIDATE_INT);
+$getSucesso  = filter_input(INPUT_GET, 'sucesso', FILTER_UNSAFE_RAW);
+if ($postAcao === 'Editar') {
+    $getSucesso = null;
+}
 if ($getSucesso) {
     $ok = true;
     $postAcao = $getSucesso;
