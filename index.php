@@ -21,6 +21,11 @@ function pr($dado, $print_r = true)
 
 $ok = false;
 $pessoaArray = [];
+$PDO = null;
+$pessoaQuery = null;
+$mensagemErro = '';
+$acaoDescricaoOk = '';
+$postAcao = null;
 
 try {
     //CONEXAO
@@ -31,8 +36,6 @@ try {
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
 
-    $mensagemErro = '';
-    $acaoDescricaoOk = '';
     $postAcao = filter_input(INPUT_POST, 'ACAO', FILTER_UNSAFE_RAW);
     $postNome = filter_input(INPUT_POST, 'NOME', FILTER_SANITIZE_SPECIAL_CHARS);
     $postId   = filter_input(INPUT_POST, 'ID_PESSOA', FILTER_VALIDATE_INT);
@@ -88,9 +91,8 @@ try {
     $mensagemErro = '<br><small>Ocorreu um erro interno no banco de dados.</small><br>';
 }
 
-// SUCESSO
-$getEditarId = filter_input(INPUT_POST, 'ID_PESSOA', FILTER_VALIDATE_INT);
-$getSucesso  = filter_input(INPUT_GET, 'sucesso', FILTER_UNSAFE_RAW);
+// SUSCESSO
+$getSucesso = filter_input(INPUT_GET, 'sucesso', FILTER_UNSAFE_RAW);
 if ($postAcao === 'Editar') {
     $getSucesso = null;
 }
@@ -101,13 +103,15 @@ if ($getSucesso) {
 }
 
 // LISTAR
-$sql = '
-    SELECT ID_PESSOA, 
-            NOME
-        FROM PESSOA
-    ORDER BY NOME
-';
-$pessoaQuery = $PDO->query($sql);
+if ($PDO) {
+    $sql = '
+        SELECT ID_PESSOA, 
+                NOME
+            FROM PESSOA
+        ORDER BY NOME
+    ';
+    $pessoaQuery = $PDO->query($sql);
+}
 ?>
 
 <!DOCTYPE html>
@@ -124,25 +128,28 @@ $pessoaQuery = $PDO->query($sql);
         <?php
         if ($postAcao && $ok) {
             echo "<h3 style='color: green;'>$acaoDescricaoOk com sucesso! $mensagemErro</h3>";
-        } elseif ($postAcao && !$ok && $mensagemErro) {
+        } elseif (!$ok && $mensagemErro) {
             echo "<h3 style='color: red;'>Não foi possível executar a ação! $mensagemErro</h3>";
         }
         ?>
         <table border="1" style="width: 100%; min-width: 500px; border-collapse: collapse;">
             <tr style="vertical-align: top;">
 
-                <!-- LISTAR PESSOAS -->
+                <!-- PESSOAS -->
                 <td style="text-align: right; padding: 1rem; width: 50%;">
-                    <h2 style="text-align: center;">Listar Pessoas</h2>
+                    <h2 style="text-align: center;">Pessoas</h2>
 
                     <?php
-                    if ($pessoaQuery->rowCount() === 0) {
+                    if (!$pessoaQuery) {
+                        echo '<h5 style="text-align: center; color: blue;">Não foi possível carregar a lista.</h5>';
+                    } elseif ($pessoaQuery->rowCount() === 0) {
                         echo '<h5 style="text-align: center; color: blue;">Não existem pessoas para listar!</h5>';
                     }
 
-                    while ($pessoaFetch = $pessoaQuery->fetch(PDO::FETCH_ASSOC)) {
-                        $pessoaArray[$pessoaFetch['ID_PESSOA']] = $pessoaFetch;
-                        echo htmlspecialchars($pessoaFetch['NOME']);
+                    if ($pessoaQuery) {
+                        while ($pessoaFetch = $pessoaQuery->fetch(PDO::FETCH_ASSOC)) {
+                            $pessoaArray[$pessoaFetch['ID_PESSOA']] = $pessoaFetch;
+                            echo htmlspecialchars($pessoaFetch['NOME']);
                     ?>
                         <!-- AÇÕES -->
                         <form method="POST" style="display: inline; margin-left: 0.5rem;">
@@ -152,11 +159,14 @@ $pessoaQuery = $PDO->query($sql);
                         </form>
                         <hr style="border: 0; border-top: 1px solid #ccc; margin: 0.5rem 0;">
                     <?php
+                        }
                     }
 
                     // MANUTENÇÃO
                     $getEditarId = filter_input(INPUT_POST, 'ID_PESSOA', FILTER_VALIDATE_INT);
-                    $pessoaAlterar = ($postAcao === 'Editar' && $getEditarId) ? @$pessoaArray[$getEditarId] : null;
+                    $pessoaAlterar = ($postAcao === 'Editar' && $getEditarId)
+                        ? ($pessoaArray[$getEditarId] ?? null)
+                        : null;
                     $acaoDescricao = ($pessoaAlterar ? 'Alterar' : 'Incluir');
                     ?>
                 </td>
