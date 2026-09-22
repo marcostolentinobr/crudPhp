@@ -164,8 +164,8 @@ if ($PDO) {
 
                     // MANUTENÇÃO
                     $getEditarId = filter_input(INPUT_POST, 'ID_PESSOA', FILTER_VALIDATE_INT);
-                    $pessoaAlterar = ($postAcao === 'Editar' && $getEditarId)
-                        ? ($pessoaArray[$getEditarId] ?? null)
+                    $pessoaAlterar = ($postAcao === 'Editar' && $getEditarId && isset($pessoaArray[$getEditarId]))
+                        ? $pessoaArray[$getEditarId]
                         : null;
                     $acaoDescricao = ($pessoaAlterar ? 'Alterar' : 'Incluir');
                     ?>
